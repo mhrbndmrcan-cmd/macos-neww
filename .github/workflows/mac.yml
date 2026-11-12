@@ -5,7 +5,7 @@ on:
 
 jobs:
   mac-desktop:
-    runs-on: macos-15-xlarge
+    runs-on: macos-15
 
     steps:
       - name: Ekran Paylasimini (VNC) Ac
