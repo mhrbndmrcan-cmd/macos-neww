@@ -8,26 +8,32 @@ jobs:
     runs-on: macos-15
 
     steps:
-      - name: Ekran Paylasimini ve Monitöru Ac
+      - name: Grafik Motorunu ve Ekran Paylasimini Ayarla
         run: |
-          # Otomatik giris yap ve ekran uyutmayi kapat
+          # 1. Oturum acacak kullaniciyi ayarla
           sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser "runner"
-          sudo pmset -a disablesleep 1
           
-          # VNC yetkilerini ver
+          # 2. VNC yetkilerini ver
           sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNC-Only -bool true
           sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNCOnly -bool true
           sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
             -activate -configure -access -on -restart -agent -privs -all -allowAccessFor -allUsers \
             -clientopts -setvnclegacy -vnclegacy yes -setvncpw -vncpw 123456
 
+          # 3. Ekrani zorla uyanik tut (Caffeinate)
+          caffeinate -u -t 21600 &
+
+          # 4. Grafik motorunu (WindowServer) yeniden baslatip masaustunu cizdir
+          sudo pkill -9 WindowServer || true
+          sleep 5
+
       - name: Tunel Kur ve Baglantiyi Ver
         run: |
           curl -fsSL https://github.com/ekzhang/bore/releases/download/v0.5.1/bore-v0.5.1-x86_64-apple-darwin.tar.gz | tar -xz
           ./bore local 5900 --to bore.pub > bore.log 2>&1 &
-          sleep 4
+          sleep 5
           echo "=========================================="
-          echo "YENI BAGLANTI ADRESI:"
+          echo "YENI ADRES:"
           cat bore.log
           echo "=========================================="
 
