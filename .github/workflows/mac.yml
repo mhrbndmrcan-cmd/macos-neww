@@ -8,30 +8,26 @@ jobs:
     runs-on: macos-15
 
     steps:
-      - name: Grafik Motorunu ve Ekran Paylasimini Ayarla
+      - name: Runner Kullanicisini ve VNC'yi Tam Yetkili Yap
         run: |
-          # 1. Oturum acacak kullaniciyi ayarla
-          sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser "runner"
+          # 1. 'runner' kullanicisina sistem sifresi ata (Sifre: 123456)
+          sudo dscl . -passwd /Users/runner 123456
           
-          # 2. VNC yetkilerini ver
-          sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNC-Only -bool true
-          sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNCOnly -bool true
+          # 2. Otomatik oturum acmayi aktif et
+          sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser "runner"
+
+          # 3. Remote Management'i 'runner' kullanicisi icin tam yetkiyle baslat
           sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
-            -activate -configure -access -on -restart -agent -privs -all -allowAccessFor -allUsers \
-            -clientopts -setvnclegacy -vnclegacy yes -setvncpw -vncpw 123456
-
-          # 3. Ekrani zorla uyanik tut (Caffeinate)
-          caffeinate -u -t 21600 &
-
-          # 4. Grafik motorunu (WindowServer) yeniden baslatip masaustunu cizdir
-          sudo pkill -9 WindowServer || true
-          sleep 5
+            -activate -configure -access -on \
+            -users runner -privs -all \
+            -clientopts -setvnclegacy yes -setvncpw -vncpw 123456 \
+            -restart -agent
 
       - name: Tunel Kur ve Baglantiyi Ver
         run: |
           curl -fsSL https://github.com/ekzhang/bore/releases/download/v0.5.1/bore-v0.5.1-x86_64-apple-darwin.tar.gz | tar -xz
           ./bore local 5900 --to bore.pub > bore.log 2>&1 &
-          sleep 5
+          sleep 4
           echo "=========================================="
           echo "YENI ADRES:"
           cat bore.log
