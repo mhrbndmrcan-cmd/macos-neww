@@ -8,12 +8,17 @@ jobs:
     runs-on: macos-15
 
     steps:
-      - name: Ekran Paylasimini (VNC) Ac
+      - name: Ekran Paylasimini ve Monitöru Ac
         run: |
+          # Otomatik giris yap ve ekran uyutmayi kapat
+          sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser "runner"
+          sudo pmset -a disablesleep 1
+          
+          # VNC yetkilerini ver
           sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNC-Only -bool true
           sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNCOnly -bool true
           sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
-            -activate -configure -access -on -restart -agent -privs -all \
+            -activate -configure -access -on -restart -agent -privs -all -allowAccessFor -allUsers \
             -clientopts -setvnclegacy -vnclegacy yes -setvncpw -vncpw 123456
 
       - name: Tunel Kur ve Baglantiyi Ver
@@ -22,7 +27,7 @@ jobs:
           ./bore local 5900 --to bore.pub > bore.log 2>&1 &
           sleep 4
           echo "=========================================="
-          echo "BAGLANTI ADRESI:"
+          echo "YENI BAGLANTI ADRESI:"
           cat bore.log
           echo "=========================================="
 
