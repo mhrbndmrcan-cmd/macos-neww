@@ -5,7 +5,7 @@ on:
 
 jobs:
   mac-desktop:
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
       - name: Runner Kullanicisini ve VNC'yi Tam Yetkili Yap
