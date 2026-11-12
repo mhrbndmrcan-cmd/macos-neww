@@ -8,20 +8,13 @@ jobs:
     runs-on: macos-15
 
     steps:
-      - name: Runner Kullanicisini ve VNC'yi Tam Yetkili Yap
+      - name: VNC Baslat
         run: |
-          # 1. Eski sifreyi sormadan doğrudan '123456' sifresini ata
-          sudo sysadminctl -resetPasswordFor runner -newPassword "123456"
-          
-          # 2. Otomatik oturum acmayi aktif et
-          sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser "runner"
-
-          # 3. Remote Management'i 'runner' kullanicisi icin tam yetkiyle baslat
+          sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNC-Only -bool true
+          sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNCOnly -bool true
           sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
-            -activate -configure -access -on \
-            -users runner -privs -all \
-            -clientopts -setvnclegacy yes -setvncpw -vncpw 123456 \
-            -restart -agent
+            -activate -configure -access -on -restart -agent -privs -all \
+            -clientopts -setvnclegacy -vnclegacy yes -setvncpw -vncpw 123456
 
       - name: Tunel Kur ve Baglantiyi Ver
         run: |
