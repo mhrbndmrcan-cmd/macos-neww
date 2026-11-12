@@ -5,13 +5,13 @@ on:
 
 jobs:
   mac-desktop:
-    runs-on: macos-15
+    runs-on: macos-13
 
     steps:
       - name: Runner Kullanicisini ve VNC'yi Tam Yetkili Yap
         run: |
-          # 1. 'runner' kullanicisina sistem sifresi ata (Sifre: 123456)
-          sudo dscl . -passwd /Users/runner 123456
+          # 1. Eski sifreyi sormadan doğrudan '123456' sifresini ata
+          sudo sysadminctl -resetPasswordFor runner -newPassword "123456"
           
           # 2. Otomatik oturum acmayi aktif et
           sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser "runner"
